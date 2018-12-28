@@ -1,26 +1,37 @@
 # This is the official copy for grading picks
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import pygsheets
+import pandas as pd
 
 # The ID and range of a sample spreadsheet.
 
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
+
 credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
 gc = gspread.authorize(credentials)
+gc1 = pygsheets.authorize(service_file='client_secret.json')
 
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
-wks = gc.open_by_key('ID')
+wks = gc.open_by_key('1Lmtt5PaegEyseFsM6p4Vr_VfMxWx5AIjKbEqB1Iddvw')
 sheet = wks.worksheet("Week 17")
 
+sh = gc1.open('Test')
+wks1 = sh[17]
+
+
+
 # grab all data into list of lists
-ExcelSheet = sheet.get_all_values()
+ExcelSheetFirstRead = sheet.get_all_values()
 
 # Step 1:
 # Build unique list and populate I2:j2
+
+d1 = pd.DataFrame()
 uniqueList = []
 
-for row in ExcelSheet[1:]:
+for row in ExcelSheetFirstRead[1:]:
     if row[1] not in uniqueList:
         uniqueList.append(row[1])
     if row[2] not in uniqueList:
@@ -28,24 +39,33 @@ for row in ExcelSheet[1:]:
     if row[3] not in uniqueList:
         uniqueList.append(row[3])
 
-print(uniqueList)
+d1['Team'] = uniqueList
+wks1.set_dataframe(d1, (1, 9))
+#print(uniqueList)
 
-# create dictionary for the spread from list of lists(excel sheet)
+# #################################################
+# ############ STOP HERE: First Step Complete  ####
+# #################################################
+
+# # create dictionary for the spread from list of lists(excel sheet)
+ExcelSheetSecondRead = sheet.get_all_values()
 spread = {}
-for i in ExcelSheet[1:]:
+for i in ExcelSheetSecondRead[1:]:
     if i[8] != "" and i[9] != "":
         spread[i[8]] = float(i[9])
-#print(spread)
+print(spread)
 
 # build players pick list
 picks = []
 # build the Players picks list
-for row in ExcelSheet[1:]:
+for row in ExcelSheetSecondRead[1:]:
     # picks[row[1], row[2], row[3], row[4]]
     picks.append(row[0:5])
 # print(picks)
 
 # Step 3 grade: compare spread{} to picks[] and write out # in picks list
+d2 = pd.DataFrame()
+
 for p in picks:
     score = float(p[4])
     score += float(spread[p[1]])
@@ -54,6 +74,9 @@ for p in picks:
     p[4] = score
 #print(picks)
 
+d2 = picks
+
+wks1.set_dataframe(d2, (1, 5))
 # update spreadsheet with this info
 
 
