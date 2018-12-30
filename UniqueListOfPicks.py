@@ -14,12 +14,13 @@ gc1 = pygsheets.authorize(service_file='client_secret.json')
 
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
-wks = gc.open_by_key('IDofWorksheet')
-# name of worksheet
+wks = gc.open_by_key('xxxx')
 sheet = wks.worksheet("Week xx")
-
-sh = gc1.open_by_key('IDofWorksheet')
-wks1 = sh[xx]
+# Worksheet id
+sh = gc1.open_by_key('xxx')
+# index of worksheet
+#wks1 = sh[17]
+wks1 = sh.worksheet('title', 'Week xx')
 
 # grab all data into list of lists
 ExcelSheetFirstRead = sheet.get_all_values()
