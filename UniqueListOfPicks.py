@@ -1,21 +1,42 @@
-#This is the official copy for getting all the unique picks
-import csv
+# This is the official copy for grading picks
+import gspread
+from oauth2client.service_account import ServiceAccountCredentials
+import pygsheets
+import pandas as pd
 
-picks = []
-with open('C:\\UniquePicks.csv') as UniquePicks:
-    Unique_csv_reader = csv.reader(UniquePicks, delimiter=',')
+# The ID and range of a sample spreadsheet.
 
-    # build the Players picks list
-    for row in Unique_csv_reader:
-        if row not in picks:
-            picks.append(row)
+scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 
-        #
-        #     print (row)
+credentials = ServiceAccountCredentials.from_json_keyfile_name('client_secret.json', scope)
+gc = gspread.authorize(credentials)
+gc1 = pygsheets.authorize(service_file='client_secret.json')
 
+# Find a workbook by name and open the first sheet
+# Make sure you use the right name here.
+wks = gc.open_by_key('IDofWorksheet')
+# name of worksheet
+sheet = wks.worksheet("Week xx")
 
-print(picks)
+sh = gc1.open_by_key('IDofWorksheet')
+wks1 = sh[xx]
 
-with open('C:\\UniquePicksOutput.csv', 'w') as UniquePicksOutput:
-    Grades_csv_writer = csv.writer(UniquePicksOutput, lineterminator='\n')
-    Grades_csv_writer.writerows(picks)
+# grab all data into list of lists
+ExcelSheetFirstRead = sheet.get_all_values()
+print(ExcelSheetFirstRead)
+# Step 1:
+# Build unique list and populate I2:j2
+
+d1 = pd.DataFrame()
+uniqueList = []
+
+for row in ExcelSheetFirstRead[1:]:
+    if row[1] not in uniqueList:
+        uniqueList.append(row[1])
+    if row[2] not in uniqueList:
+        uniqueList.append(row[2])
+    if row[3] not in uniqueList:
+        uniqueList.append(row[3])
+
+d1['Team'] = uniqueList
+wks1.set_dataframe(d1, (1, 9))
