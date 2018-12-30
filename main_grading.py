@@ -14,13 +14,12 @@ gc1 = pygsheets.authorize(service_file='client_secret.json')
 
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
-wks = gc.open_by_key('IDofSheet')
-# name of worksheet
-sheet = wks.worksheet("Week 17")
+wks = gc.open_by_key('SpreadSheetID')
+sheet = wks.worksheet("Week xxx")
 
-sh = gc1.open_by_key('IDofSheet')
-# index number of sheet
-wks1 = sh[17]
+sh = gc1.open_by_key('SpreadSheetID')
+#wks1 = sh[17]
+wks1 = sh.worksheet('title', 'Week xxx')
 
 
 
