@@ -14,46 +14,28 @@ gc1 = pygsheets.authorize(service_file='client_secret.json')
 
 # Find a workbook by name and open the first sheet
 # Make sure you use the right name here.
-wks = gc.open_by_key('1Lmtt5PaegEyseFsM6p4Vr_VfMxWx5AIjKbEqB1Iddvw')
+wks = gc.open_by_key('IDofSheet')
+# name of worksheet
 sheet = wks.worksheet("Week 17")
 
-sh = gc1.open('Test')
+sh = gc1.open_by_key('IDofSheet')
+# index number of sheet
 wks1 = sh[17]
 
 
 
-# grab all data into list of lists
-ExcelSheetFirstRead = sheet.get_all_values()
-
-# Step 1:
-# Build unique list and populate I2:j2
-
-d1 = pd.DataFrame()
-uniqueList = []
-
-for row in ExcelSheetFirstRead[1:]:
-    if row[1] not in uniqueList:
-        uniqueList.append(row[1])
-    if row[2] not in uniqueList:
-        uniqueList.append(row[2])
-    if row[3] not in uniqueList:
-        uniqueList.append(row[3])
-
-d1['Team'] = uniqueList
-wks1.set_dataframe(d1, (1, 9))
-#print(uniqueList)
-
-# #################################################
-# ############ STOP HERE: First Step Complete  ####
-# #################################################
-
-# # create dictionary for the spread from list of lists(excel sheet)
+# create dictionary for the spread from list of lists(excel sheet)
+# grab all data into list of lists, using gspread to read data
 ExcelSheetSecondRead = sheet.get_all_values()
+
+
 spread = {}
+
 for i in ExcelSheetSecondRead[1:]:
     if i[8] != "" and i[9] != "":
         spread[i[8]] = float(i[9])
 print(spread)
+
 
 # build players pick list
 picks = []
@@ -61,23 +43,17 @@ picks = []
 for row in ExcelSheetSecondRead[1:]:
     # picks[row[1], row[2], row[3], row[4]]
     picks.append(row[0:5])
-# print(picks)
+print(picks)
 
 # Step 3 grade: compare spread{} to picks[] and write out # in picks list
 d2 = pd.DataFrame()
-
 for p in picks:
     score = float(p[4])
     score += float(spread[p[1]])
     score += float(spread[p[2]])
     score += float(spread[p[3]])
     p[4] = score
-#print(picks)
+print(picks)
 
 d2 = picks
-
-wks1.set_dataframe(d2, (1, 5))
-# update spreadsheet with this info
-
-
-
+wks1.update_values((2, 1), d2)
